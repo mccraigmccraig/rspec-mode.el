@@ -26,33 +26,38 @@
     (unless (equal dir "/")
       (rails-root (expand-file-name (concat dir "../"))))))
 
-(defun spec-command ()
+(defun spec-command ( cmd-name )
   (if (rails-root)
-      (let ((script-spec (concat (rails-root) "script/spec"))
-            (plugin-spec (concat (rails-root) "vendor/plugins/rspec/bin/spec")))
+      (let ((script-spec (concat (rails-root) "script/" cmd-name))
+            (plugin-spec (concat (rails-root) "vendor/plugins/rspec/bin/" cmd-name)))
         (cond ((file-exists-p script-spec) script-spec)
               ((file-exists-p plugin-spec) plugin-spec)
-              (t "spec")))
-    "spec"))
+              (t cmd-name)))
+    cmd-name))
 
 (defun run-specs ()
   "Run specs and display results in same buffer"
   (interactive)
-  (do-run-spec))
+  (do-run-spec (spec-command "spec")))
 
+(defun run-jspecs ()
+  "Run specs under jruby and display results in same buffer"
+  (interactive)
+  (do-run-spec (spec-command "jspec")))
+ 
 (defun run-focused-spec ()
   "Run the example defined on the current line"
   (interactive)
-  (do-run-spec (concat "--line=" (number-to-string (line-number-at-pos)))))
+  (do-run-spec (spec-command "spec") (concat "--line=" (number-to-string (line-number-at-pos)))))
 
 (load (concat (file-name-directory load-file-name) "linkify"))
-(defun do-run-spec (&rest args)
+(defun do-run-spec (cmd &rest args)
   (setq rspec-results (get-buffer-create "rspec-results"))
   (save-excursion
     (set-buffer rspec-results)
     (erase-buffer)
     (setq linkify-regexps '("^\\(/.*\\):\\([0-9]*\\):$")))
-  (setq proc (apply #'start-process "rspec" rspec-results (spec-command) (buffer-file-name) args))
+  (setq proc (apply #'start-process "rspec" rspec-results cmd (buffer-file-name) args))
   (set-process-filter proc 'linkify-filter)
   (display-buffer rspec-results))
 (provide 'rspec-mode)
