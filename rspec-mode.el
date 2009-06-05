@@ -55,9 +55,8 @@
   (setq rspec-results (get-buffer-create "rspec-results"))
   
   (defun scroll-to-end-of-results (proc state)
-    (let ((curwin (selected-window))
-	  (results-win (display-buffer rspec-results)))
-      (select-window results-win)
+    (let ((curwin (selected-window)))
+      (select-window (display-buffer rspec-results))
       (goto-char (point-max))
       (select-window curwin)))
 
@@ -69,8 +68,7 @@
   (set-process-filter proc 'linkify-filter)
   (set-process-sentinel proc 'scroll-to-end-of-results)
     
-  (let ((results-win (display-buffer rspec-results)))
-    (select-window results-win)
-    (goto-char (point-max))))
+  (select-window (display-buffer rspec-results))
+  (goto-char (point-max)))
   
 (provide 'rspec-mode)
