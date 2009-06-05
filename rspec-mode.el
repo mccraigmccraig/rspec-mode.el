@@ -53,10 +53,11 @@
 (load (concat (file-name-directory load-file-name) "linkify"))
 (defun do-run-spec (cmd &rest args)
   (setq rspec-results (get-buffer-create "rspec-results"))
-
+  
   (defun scroll-to-end-of-results (proc state)
-    (let ((curwin (selected-window)))
-      (ecb-goto-window-compilation)
+    (let ((curwin (selected-window))
+	  (results-win (display-buffer rspec-results)))
+      (select-window results-win)
       (goto-char (point-max))
       (select-window curwin)))
 
@@ -67,13 +68,9 @@
   (setq proc (apply #'start-process "rspec" rspec-results cmd (buffer-file-name) args))
   (set-process-filter proc 'linkify-filter)
   (set-process-sentinel proc 'scroll-to-end-of-results)
-  (display-buffer rspec-results)
-  (ecb-goto-window-compilation)
-  (goto-char (point-max)))
+    
+  (let ((results-win (display-buffer rspec-results)))
+    (select-window results-win)
+    (goto-char (point-max))))
   
 (provide 'rspec-mode)
-
-
-
-
-
