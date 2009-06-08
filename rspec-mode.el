@@ -16,11 +16,14 @@
     (define-key map (kbd "\C-c f") 'run-focused-spec)
     map))
 
+(defun rspec-mode-ecb-compat ()
+  (if (boundp 'ecb-compilation-buffer-names)
+      (add-to-list 'ecb-compilation-buffer-names '("rspec-results"))))
+  
 (add-hook 'rspec-mode-hook
-          (lambda () (use-local-map rspec-mode-map)))
+          (lambda () (progn (use-local-map rspec-mode-map)
+			    (rspec-mode-ecb-compat))))
 
-(if (boundp 'ecb-compilation-buffer-names)
-    (add-to-list 'ecb-compilation-buffer-names '("rspec-results")))
 
 (defun rails-root (&optional dir)
   (or dir (setq dir default-directory))
