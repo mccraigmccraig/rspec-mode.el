@@ -19,6 +19,9 @@
 (add-hook 'rspec-mode-hook
           (lambda () (use-local-map rspec-mode-map)))
 
+(if (boundp 'ecb-compilation-buffer-names)
+    (add-to-list 'ecb-compilation-buffer-names '("rspec-results")))
+
 (defun rails-root (&optional dir)
   (or dir (setq dir default-directory))
   (if (file-exists-p (concat dir "config/environment.rb"))
@@ -55,10 +58,11 @@
   (setq rspec-results (get-buffer-create "rspec-results"))
   
   (defun scroll-to-end-of-results (proc state)
-    (let ((curwin (selected-window)))
-      (select-window (display-buffer rspec-results))
-      (goto-char (point-max))
-      (select-window curwin)))
+    (save-excursion
+      (let ((curwin (selected-window)))
+	(select-window (display-buffer rspec-results) t)
+	(goto-char (point-max))
+	(select-window curwin))))
 
   (save-excursion
     (set-buffer rspec-results)
