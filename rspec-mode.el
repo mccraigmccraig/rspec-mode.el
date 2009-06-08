@@ -14,6 +14,7 @@
   (let ((map (make-keymap)))
     (define-key map (kbd "\C-c s") 'run-specs)
     (define-key map (kbd "\C-c f") 'run-focused-spec)
+    (define-key map (kbd "\C-c j") 'run-jspecs)
     map))
 
 (defun rspec-mode-ecb-compat ()
