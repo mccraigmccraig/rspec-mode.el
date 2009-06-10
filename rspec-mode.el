@@ -66,6 +66,7 @@
       (let ((curwin (selected-window)))
 	(select-window (display-buffer rspec-results) t)
 	(goto-char (point-max))
+	(insert "\n*finished*")
 	(select-window curwin))))
 
   (save-excursion
