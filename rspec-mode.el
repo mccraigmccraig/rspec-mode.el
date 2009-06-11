@@ -61,23 +61,26 @@
 (defun do-run-spec (cmd &rest args)
   (setq rspec-results (get-buffer-create "rspec-results"))
   
-  (defun scroll-to-end-of-results (proc state)
-    (save-excursion
-      (let ((curwin (selected-window)))
-	(select-window (display-buffer rspec-results) t)
-	(goto-char (point-max))
-	(insert "\n*finished*")
-	(select-window curwin))))
-
-  (save-excursion
-    (set-buffer rspec-results)
-    (erase-buffer)
-    (setq linkify-regexps '("^\\(/.*\\):\\([0-9]*\\):$")))
-  (setq proc (apply #'start-process "rspec" rspec-results cmd (buffer-file-name) args))
-  (set-process-filter proc 'linkify-filter)
-  (set-process-sentinel proc 'scroll-to-end-of-results)
-    
-  (select-window (display-buffer rspec-results))
-  (goto-char (point-max)))
+  (lexical-let ((startwin (selected-window)))
+    (labels ((scroll-to-end-of-results (proc state)
+				       (save-excursion
+					 (let ((curwin (selected-window)))
+					   (select-window (display-buffer rspec-results) t)
+					   (let ((resultswin (selected-window)))
+					     (goto-char (point-max))
+					     (insert "\n*finished*")
+					     (if (eql curwin resultswin)
+						 (select-window startwin)
+					       (select-window curwin)))))))
+      (save-excursion
+	(set-buffer rspec-results)
+	(erase-buffer)
+	(setq linkify-regexps '("^\\(/.*\\):\\([0-9]*\\):$")))
+      (setq proc (apply #'start-process "rspec" rspec-results cmd (buffer-file-name) args))
+      (set-process-filter proc 'linkify-filter)
+      (set-process-sentinel proc #'scroll-to-end-of-results)
+      
+      (select-window (display-buffer rspec-results))
+      (goto-char (point-max)))))
   
 (provide 'rspec-mode)
