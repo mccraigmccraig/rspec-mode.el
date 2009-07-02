@@ -15,6 +15,7 @@
     (define-key map (kbd "\C-c s") 'run-specs)
     (define-key map (kbd "\C-c f") 'run-focused-spec)
     (define-key map (kbd "\C-c j") 'run-jspecs)
+    (define-key map (kbd "\C-c k") 'run-focused-jspec)
     map))
 
 (defun rspec-mode-ecb-compat ()
@@ -47,15 +48,20 @@
   (interactive)
   (do-run-spec (spec-command "spec")))
 
+(defun run-focused-spec ()
+  "Run the example defined on the current line"
+  (interactive)
+  (do-run-spec (spec-command "spec") (concat "--line=" (number-to-string (line-number-at-pos)))))
+
 (defun run-jspecs ()
   "Run specs under jruby and display results in same buffer"
   (interactive)
   (do-run-spec (spec-command "jspec")))
  
-(defun run-focused-spec ()
+(defun run-focused-jspec ()
   "Run the example defined on the current line"
   (interactive)
-  (do-run-spec (spec-command "spec") (concat "--line=" (number-to-string (line-number-at-pos)))))
+  (do-run-spec (spec-command "jspec") (concat "--line=" (number-to-string (line-number-at-pos)))))
 
 (load (concat (file-name-directory load-file-name) "linkify"))
 (defun do-run-spec (cmd &rest args)
