@@ -61,7 +61,8 @@
 (defun run-focused-jspec ()
   "Run the example defined on the current line"
   (interactive)
-  (do-run-spec (spec-command "jspec") (concat "--line=" (number-to-string (line-number-at-pos)))))
+;;  (do-run-spec (spec-command "jspec") (concat "--line=" (number-to-string (line-number-at-pos)))))
+  (do-run-spec (spec-command "jspec") (concat "--example=" (rspec-example-name))))
 
 (load (concat (file-name-directory load-file-name) "linkify"))
 (defun do-run-spec (cmd &rest args)
@@ -88,5 +89,26 @@
       
       (select-window (display-buffer rspec-results))
       (goto-char (point-max)))))
-  
+
+;; thanks pezra
+(defun rspec-beginning-of-example ()
+  "Moves point to the beginning of the example in which the point current is."
+  (interactive)
+  (let ((start (point)))
+    (goto-char
+     (save-excursion
+       (end-of-line)
+       (unless (and (search-backward-regexp "^[[:space:]]*it[[:space:]]*(?[[:space:]][\"']" nil t)
+                    (save-excursion (ruby-end-of-block) (< start (point))))
+         (error "Unable to find an example"))
+       (point)))))
+
+(defun rspec-example-name ()
+  "returns the name of the example in which point is."
+  (save-excursion
+    (rspec-beginning-of-example)
+    (search-forward-regexp "^[[:space:]]*it[[:space:]]*(?[[:space:]]*[\"']\\(.*\\)[\"']" nil t)
+    (match-string 1)))
+
+
 (provide 'rspec-mode)
