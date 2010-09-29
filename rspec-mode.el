@@ -46,23 +46,23 @@
 (defun run-specs ()
   "Run specs and display results in same buffer"
   (interactive)
-  (do-run-spec (spec-command "spec")))
+  (do-run-spec (spec-command "spec") "--backtrace"))
 
 (defun run-focused-spec ()
   "Run the example defined on the current line"
   (interactive)
-  (do-run-spec (spec-command "spec") (concat "--line=" (number-to-string (line-number-at-pos)))))
+  (do-run-spec (spec-command "spec") "--backtrace" (concat "--example=" (rspec-example-name))))
 
 (defun run-jspecs ()
   "Run specs under jruby and display results in same buffer"
   (interactive)
-  (do-run-spec (spec-command "jspec")))
+  (do-run-spec (spec-command "jspec") "--backtrace"))
  
 (defun run-focused-jspec ()
   "Run the example defined on the current line"
   (interactive)
 ;;  (do-run-spec (spec-command "jspec") (concat "--line=" (number-to-string (line-number-at-pos)))))
-  (do-run-spec (spec-command "jspec") (concat "--example=" (rspec-example-name))))
+  (do-run-spec (spec-command "jspec") "--backtrace" (concat "--example=" (rspec-example-name))))
 
 (load (concat (file-name-directory load-file-name) "linkify"))
 (defun do-run-spec (cmd &rest args)
